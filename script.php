@@ -136,6 +136,10 @@ if (isset($_FILES['file']) && is_writable(VAR_FILES)
         echo 'Error 6 ' . $res['error']['why'];
         exit;
     }
+    /* Send email if given */
+    if (isset($_POST['email'])) {
+        mail($_POST['email'], 'Digitick : lien vers votre fichier', 'Suivez le lien pour accéder à votre fichier : ' . $cfg['web_root'].'f.php?h='.$res['link']);
+    }
     /* Print direct link. */
     echo $res['link'];
     /* Print delete link. */

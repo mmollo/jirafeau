@@ -145,11 +145,11 @@ function show_link (reference, delete_code, crypt_key, date)
 
     // Email link
     var filename = document.getElementById('file_select').files[0].name;
-    var b = encodeURIComponent("Download file \"" + filename + "\":") + "%0D";
+    var b = encodeURIComponent("Télécharger le fichier \"" + filename + "\":") + "%0D";
     b += encodeURIComponent(web_root + download_link_href) + "%0D";
     if (false == isEmpty(date))
     {
-        b += "%0D" + encodeURIComponent("This file will be available until " + date.format('YYYY-MM-DD hh:mm (GMT O)')) + "%0D";
+        b += "%0D" + encodeURIComponent("Ce fichier sera disponible jusqu au  " + date.format('hh:mm (GMT 0) YYYY-MM-DD')) + "%0D";
         document.getElementById('upload_link_email').href = "mailto:?body=" + b + "&subject=" + encodeURIComponent(filename);
     }
 
@@ -332,7 +332,7 @@ function add_time_string_to_date(d, time)
     return false;
 }
 
-function classic_upload (file, time, password, one_time, upload_password)
+function classic_upload (file, time, password, one_time, upload_password, email)
 {
     // Delay time estimation init as we can't have file size
     upload_time_estimation_init(0);
@@ -375,6 +375,7 @@ function classic_upload (file, time, password, one_time, upload_password)
 
     var form = new FormData();
     form.append ("file", file);
+    form.append ("email", email);
     if (time)
         form.append ("time", time);
     if (password)
@@ -399,7 +400,7 @@ var async_global_max_size = 0;
 var async_global_time;
 var async_global_transfering = 0;
 
-function async_upload_start (max_size, file, time, password, one_time, upload_password)
+function async_upload_start (max_size, file, time, password, one_time, upload_password, email)
 {
     async_global_transfered = 0;
     async_global_file = file;
@@ -432,6 +433,7 @@ function async_upload_start (max_size, file, time, password, one_time, upload_pa
     var form = new FormData();
     form.append ("filename", async_global_file.name);
     form.append ("type", async_global_file.type);
+    form.append ("email", email);
     if (time)
         form.append ("time", time);
     if (password)
@@ -567,7 +569,8 @@ function upload (max_size)
             document.getElementById('select_time').value,
             document.getElementById('input_key').value,
             document.getElementById('one_time_download').checked,
-            document.getElementById('upload_password').value
+            document.getElementById('upload_password').value,
+            document.getElementById('file_email').value
             );
     }
     else
@@ -577,7 +580,8 @@ function upload (max_size)
             document.getElementById('select_time').value,
             document.getElementById('input_key').value,
             document.getElementById('one_time_download').checked,
-            document.getElementById('upload_password').value
+            document.getElementById('upload_password').value,
+            document.getElementById('file_email').value
             );
     }
 }

@@ -112,5 +112,7 @@
     "MINUTE": "minute",
     "HOUR": "hour",
     "SECOND": "second",
-    "LESS_1_SEC": "less than a second"
+    "LESS_1_SEC": "less than a second",
+    "EMAIL": "Email address",
+    "EMAIL_SENT": "Email sent !"
 }
