@@ -138,7 +138,7 @@ if (isset($_FILES['file']) && is_writable(VAR_FILES)
     }
     /* Send email if given */
     if (isset($_POST['email'])) {
-        mail($_POST['email'], 'Digitick : lien vers votre fichier', 'Suivez le lien pour accéder à votre fichier : ' . $cfg['web_root'].'f.php?h='.$res['link']);
+        send_link_mail($_POST['email'], $res['link']);
     }
     /* Print direct link. */
     echo $res['link'];
@@ -414,6 +414,11 @@ elseif (isset($_GET['init_async'])) {
         $key = $_POST['key'];
     }
 
+    $email = '';
+    if (isset($_POST['email'])) {
+        $email = $_POST['email'];
+    }
+
     $time = time();
     if (!isset($_POST['time']) || !$cfg['availabilities'][$_POST['time']]) {
         echo 'Error 22';
@@ -446,12 +451,14 @@ elseif (isset($_GET['init_async'])) {
                 break;
         }
     }
+
     echo jirafeau_async_init($_POST['filename'],
                               $type,
                               isset($_POST['one_time_download']),
                               $key,
                               $time,
-                              get_ip_address($cfg));
+                              get_ip_address($cfg),
+                              $email);
 }
 /* Continue an asynchronous upload. */
 elseif (isset($_GET['push_async'])) {

@@ -748,6 +748,7 @@ function jirafeau_get_async_ref($ref)
     $out['ip'] = trim($c[5]);
     $out['last_edited'] = trim($c[6]);
     $out['next_code'] = trim($c[7]);
+    $out['email'] = trim($c[8]);
     return $out;
 }
 
@@ -781,9 +782,10 @@ function jirafeau_async_delete($ref)
   * @param $key eventual password (or blank)
   * @param $time time limit
   * @param $ip ip address of the client
+  * @param $email email address to send file link
   * @return a string containing a temporary reference followed by a code or the string 'Error'
   */
-function jirafeau_async_init($filename, $type, $one_time, $key, $time, $ip)
+function jirafeau_async_init($filename, $type, $one_time, $key, $time, $ip, $email = '')
 {
     $res = 'Error';
 
@@ -814,7 +816,9 @@ function jirafeau_async_init($filename, $type, $one_time, $key, $time, $ip)
             str_replace(NL, '', trim($filename)) . NL .
             str_replace(NL, '', trim($type)) . NL . $password . NL .
             $time . NL . ($one_time ? 'O' : 'R') . NL . $ip . NL .
-            time() . NL . $code . NL);
+            time() . NL . $code . NL .
+            $email . NL
+    );
     fclose($handle);
 
     return $ref . NL . $code ;
@@ -875,7 +879,9 @@ function jirafeau_async_push($ref, $data, $code, $max_file_size)
     fwrite($handle,
             $a['file_name'] . NL. $a['mime_type'] . NL. $a['key'] . NL .
             $a['time'] . NL . $a['onetime'] . NL . $a['ip'] . NL .
-            time() . NL . $code . NL);
+            time() . NL . $code . NL .
+            $a['email'] . NL
+    );
     fclose($handle);
     return $code;
 }
@@ -949,6 +955,10 @@ function jirafeau_async_end($ref, $code, $crypt, $link_name_length)
     if (!@mkdir(VAR_LINKS . $l, 0755, true) ||
         !rename($link_tmp_name, VAR_LINKS . $l . $md5_link)) {
         echo "Error";
+    }
+
+    if($a['email']) {
+        send_link_mail($a['email'], $md5_link);
     }
 
     /* Clean async upload. */
@@ -1242,4 +1252,10 @@ function jirafeau_replace_markers($content, $htmllinebreaks = false)
     }
 
     return $content;
+}
+
+function send_link_mail($email, $md5_link)
+{
+    global $cfg;
+    return mail($email, 'Digitick : lien vers votre fichier', 'Suivez le lien pour accéder à votre fichier : ' . $cfg['web_root'].'f.php?h='.$md5_link);
 }
